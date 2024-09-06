@@ -82,3 +82,84 @@ Central Scheduler assigns uncontested path for flows tha exceed a threshold in s
 Has component failure detection and a degree of redundancy to tolerate it 
 
 ![image-20240904153951681](/home/seth/.var/app/io.typora.Typora/config/Typora/typora-user-images/image-20240904153951681.png)
+
+
+
+## Jupiter Rising: A Decade of Clos Topologies and Centralized Control in Google’s Datacenter Network
+
+Published: 2015
+
+[Link](https://dl.acm.org/doi/pdf/10.1145/2829988.2787508)
+
+**Main themes**
+
+* Multi-stage Clos topologies built from commodity switch silicon can support cost-effective deployment for large clusters
+* Central control mechanism is sufficient in most cases
+* Modular hardware and simple software allows for scaling 
+
+**Problem:** 10 years ago, cost and operational complexity associated with traditional datacenter network architectures was prohibitive; Traditional cluster architecture met scale needs but fell short in terms of overall performance and cost
+
+**Summary**
+
+```  This paper describes our experience with building five generations of custom data center network hardware and software leveraging commodity hardware components, while addressing the control and management requirements introduced by our approach``` 
+
+General Structure
+
+![image-20240906105508671](/home/seth/.var/app/io.typora.Typora/config/Typora/typora-user-images/image-20240906105508671.png)
+
+** Fire House Version 1**
+
+![image-20240906120543257](/home/seth/.var/app/io.typora.Typora/config/Typora/typora-user-images/image-20240906120543257.png)
+
+*  8x10G switches for the fabric and 4x10G switches for ToRs
+
+* Low radix of ToRs caused reliability issues
+
+**Fire House Verison 1.1**
+
+![image-20240906120400600](/home/seth/.var/app/io.typora.Typora/config/Typora/typora-user-images/image-20240906120400600.png)
+
+* Version 1 + a custom datacenter cluster fabric (new scheme for the aggregation layer )
+* Compact PCI chassis each with 6 independent linecards and a dedicated Single-Board Computer (SBC) to control the linecards using PCI
+* Each ToR has 4 uplinks
+* scale to 2x the number of machines while being much more robust to link failure
+* Wiring was an issue
+
+**Watch Tower**
+
+* key idea was to leverage the next-generation merchant silicon switch chips, 16x10G, to build a traditional switch chassis with a backplane
+* larger bandwidth density of the switching silicon also allowed us to build larger fabrics with more bandwidth to individual servers
+* Cable bundling helped reduce fiber cost (capex + opex) by nearly 40%
+* Still expensive
+
+**Saturn** 
+
+* principal goals were to increase bandwidth and maximum cluster scale
+* Built using 24x10G merchant silicon building blocks
+* could burst at 10Gbps across fabric
+
+**Jupiter** 
+
+![image-20240906121731711](/home/seth/.var/app/io.typora.Typora/config/Typora/typora-user-images/image-20240906121731711.png)
+
+
+
+* 40GB burst bandwidth
+
+**External Connectivity**
+
+![image-20240906122525816](/home/seth/.var/app/io.typora.Typora/config/Typora/typora-user-images/image-20240906122525816.png)
+
+### Software
+
+**Neighbor Discovery** 
+
+Used the configured view of cluster topology together with a switch’s local ID to determine the expected peer IDs of its local ports. It regularly exchanges its local port ID, expected peer port ID, discovered peer port ID, and link error signal. Doing so allows ND on both ends of a link to verify correct cabling.
+
+**Firepath**
+
+ Centralized topology state distribution, but distributed forwarding table computation
+
+* Master constructs Link State Database which it then distributes to client
+* Client use link stage database to calculate shortest path forwarding with ECMP and programs the hardware forwarding tables local to its switch
+* redundant master instances on pre-selected spine switches
