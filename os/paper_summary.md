@@ -92,7 +92,7 @@ Problem: old file system cannot provide needed throughput; it could only provide
 
 Allocation of data blocks is sub-optimal: ``` The traditional file system never transfers more than 512 bytes per disk transaction and often finds that the next sequential data block is not on the same cylinder, forcing seeks between 512 byte transfers. ```
 
-New File System Organization 
+### New File System Organization 
 
 **Cylinder group**: one or more consecutive cylinders on a disk. 
 
