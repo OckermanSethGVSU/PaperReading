@@ -71,6 +71,20 @@ Segment usage table keeps track of how many live bytes and most recent modified 
 
 * Roll forward to see what data can be recovered after 
 
+### Class Discussion
+
+Motivation
+
+* processors are getting faster while I/O is not 
+* Main memory increasing, therefore main main handles reads but not so much writes
+* Seek time not improving
+* Many small files 
+* Meta-data intensive operations
+
+---
+
+
+
 ## A Fast File System for Unix
 
 Published: 1984
@@ -87,8 +101,6 @@ Achievements
 ### Introduction
 
 Problem: old file system cannot provide needed throughput; it could only provide about 2% of max disk bandwidth
-
-
 
 Allocation of data blocks is sub-optimal: ``` The traditional file system never transfers more than 512 bytes per disk transaction and often finds that the next sequential data block is not on the same cylinder, forcing seeks between 512 byte transfers. ```
 
@@ -115,3 +127,41 @@ Global calls local and asks for a block, if local can't give then
 2. Use a block within the same cylinder group
 3. Quadratically hash the cylinder group number to choose another cylinder group to look for a free block
 4. Apply an exhaustive search to all cylinder groups
+
+### Class Discussion
+
+**Problem**
+
+1. Free list disorganized, leading to random seeks
+2. Small block size leads to
+   1.  less throughput
+   2. more indirect block
+3. No locality in allocation
+   1. i-nodes far from data blocks
+   2. i-nodes in the same dir are scattered
+
+**Solution**
+
+1. Bitmaps (using signal bit to represent fragments for both i-nodes and data maps)
+
+2. Double block size from 512 bytes to 1028 bytes
+
+   * limit block size b/c most files are small, leading to lots of internal fragmentation; classic time and space tradeoff
+
+   * Hybrid solution - have big block size but allow fragmentation of block when needed
+
+     **Fragmentation**
+
+     * Writing less than a full block is inefficient
+     * Potentially requires copying out fragments  
+
+3. Groups of i-node and data pairs in cylinder groups (called block group in some systems)
+
+   * replicate super blocks for reliability
+
+   * Placement policy
+     * Put data blocks near i-nodes
+     * Put i-nodes in directory together
+       * File i-nodes put in same group
+       * Allocate new group for dir i-nodes
+         * Pick one with fewer allocated i-nodes
