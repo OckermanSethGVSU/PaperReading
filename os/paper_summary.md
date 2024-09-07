@@ -48,7 +48,7 @@ Addressing 1
 
 * Use i-node map that maintains current location of i-nodes; given the identifying number for a file, the i-node map must be indexed to determine the disk address of the i-node.
 
-  Can fit in main memory (yay)
+  * Can fit ptrs to i-map pieces in main memory (yay)
 
 Addressing 2
 
@@ -80,6 +80,21 @@ Motivation
 * Seek time not improving
 * Many small files 
 * Meta-data intensive operations
+
+Weaknesses of in-place file systems
+
+* allocating data all over create expensive seeks
+
+Idea: File system buffers writes in main memory until "enough" data
+
+I-map: i-node number -> i-node location on disk\
+
+* I-Map is written in segments
+
+Crashes
+
+* Occasionally check point to known on-disk location
+* Two check-points locations 
 
 ---
 
@@ -165,3 +180,53 @@ Global calls local and asks for a block, if local can't give then
        * File i-nodes put in same group
        * Allocate new group for dir i-nodes
          * Pick one with fewer allocated i-nodes
+
+---
+
+## A Case for Redundant Arrays of Inexpensive Disks
+
+Published: 1988
+
+[Link](https://dl.acm.org/doi/10.1145/50202.50214)
+
+Motivation: CPU getting faster and the size of main memory growing. To fully benefit from this, secondary storage must also grow faster. 
+
+SLED = single large expensive magnetic disk
+
+**Problem**
+
+* SLED performance improving slowly = dominated by seek and rotation delays
+  * raw seek time only improved at a rate of 7% per year. 
+
+Larger main memories and buffered writes in main memory help, but applications with high rate of small, random data requests or few but large data requests are limited by Disk I/O
+
+**Solution: Array of Inexpensive Disks**
+
+RAID: redundant arrays of inexpensive disks 
+
+Basic approach: break the arrays into reliability groups, with each group having extra "check" disks containing redundant information. If a disk fails, replace it and reconstruct data from the redundant info 
+
+RAID Level 1:  Mirrored Disk
+
+* Duplicate disk
+  * Enables parallelism
+
+Raid Level 2: Hamming Code for ECC 
+
+* Stripe data at a bit level and uses a hamming code for error correction
+
+Raid Level 3: Single Check Disk Per Group
+
+* Byte level stripping with error correction
+* Less check disks per group 
+
+Raid Level 4: Independent Read/Writes
+
+* Spreads reads across disks
+* Writes still only one per group b/c it must write check disk
+* Dedicated parity disk
+
+ RAID Level 5: No Single Check Disk
+
+* Distributed data and check information across all disks 
+* Now can do individual writes and reads per group
