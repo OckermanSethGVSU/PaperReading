@@ -206,27 +206,27 @@ RAID: redundant arrays of inexpensive disks
 
 Basic approach: break the arrays into reliability groups, with each group having extra "check" disks containing redundant information. If a disk fails, replace it and reconstruct data from the redundant info 
 
-RAID Level 1:  Mirrored Disk
+**RAID Level 1:  Mirrored Disk**
 
 * Duplicate disk
   * Enables parallelism
 
-Raid Level 2: Hamming Code for ECC 
+**Raid Level 2: Hamming Code for ECC** 
 
 * Stripe data at a bit level and uses a hamming code for error correction
 
-Raid Level 3: Single Check Disk Per Group
+**Raid Level 3: Single Check Disk Per Group**
 
 * Byte level stripping with error correction
 * Less check disks per group 
 
-Raid Level 4: Independent Read/Writes
+**Raid Level 4: Independent Read/Writes**
 
 * Spreads reads across disks
 * Writes still only one per group b/c it must write check disk
 * Dedicated parity disk
 
- RAID Level 5: No Single Check Disk
+ **RAID Level 5: No Single Check Disk**
 
 * Distributed data and check information across all disks 
 * Now can do individual writes and reads per group
