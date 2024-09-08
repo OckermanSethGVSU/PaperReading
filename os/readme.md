@@ -230,3 +230,48 @@ Basic approach: break the arrays into reliability groups, with each group having
 
 * Distributed data and check information across all disks 
 * Now can do individual writes and reads per group
+
+## Row-Diagonal Parity for Double Disk Failure Correction
+
+Published: 2004
+
+##### [Link](https://www.usenix.org/legacy/publications/library/proceedings/fast04/tech/corbett/corbett.pdf)
+
+Main idea: algorithm for protecting against double disk failures 
+
+Motivations
+
+* RAID (most settings) can't handle double disk failures 
+
+RDP requires exactly two parity disks and uses only xor operations during parity construction and reconstruction
+
+Whloe disk failures 
+
+* require construction of loss data (portions with data or whole)
+* Stresses I/O
+* Add to CPU load
+
+Media Failures (failure in a single write block?)
+
+* For writes, it is handled by relocating bad block 
+* For reads, handles by a recovery period through retry sequences 
+* 1 bit error per 10^4 to 10^5 bits read, which leads to one uncorrectable error per 10TBytes to 100TBytes transferred
+
+Double failure combinations: whole-disk/whole-disk, wholedisk/media, and media/media
+
+### RDP
+
+The RDP algorithm is based on a simple parity encoding scheme using only exclusiveor operations. Each data block belongs to one row parity set and to one diagonal parity set. In the normal configuration, there is one row parity block and one diagonal parity block per strip.
+
+
+
+Stripe: row from each disk 
+
+p is a governing parameter that must be a prime number greater than two 
+
+![image-20240908150845024](/home/seth/.var/app/io.typora.Typora/config/Typora/typora-user-images/image-20240908150845024.png)
+
+* Read performance unaffected
+* Full stripe writes writes cost one additionally disk I/O compared to single disk parity arrays
+* Paritial stripe writes can be done via subtraction or addition method (in the end, still need to write to 2 data blocks)
+* Xors required = `2p^2 − 6p + 4` 
