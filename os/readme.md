@@ -273,5 +273,5 @@ p is a governing parameter that must be a prime number greater than two
 
 * Read performance unaffected
 * Full stripe writes writes cost one additionally disk I/O compared to single disk parity arrays
-* Paritial stripe writes can be done via subtraction or addition method (in the end, still need to write to 2 data blocks)
+* Partial stripe writes can be done via subtraction or addition method (in the end, still need to write to 2 data blocks)
 * Xors required = `2p^2 − 6p + 4` 
